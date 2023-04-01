@@ -1,0 +1,35 @@
+import check_version
+import device_setup
+import sender
+import sys
+import zipfile
+
+
+def help():
+    print("Specify a command: (setup|sender|enable)")
+
+
+def main():
+    args = sys.argv
+    if len(args) < 2:
+        help()
+        exit(1)
+    executable = args[0]
+    command = args[1]
+
+    check_version.check()
+
+    if command == "enable":
+        device_setup.enable_service(executable)
+    elif command == "requirements":
+        with zipfile.ZipFile(executable) as z:
+            with z.open('requirements.txt') as zf:
+                print(zf.read().decode("utf-8"))
+    elif command == "sender":
+        sender.run()
+    elif command == "setup":
+        device_setup.self_setup()
+
+
+if __name__ == '__main__':
+    main()

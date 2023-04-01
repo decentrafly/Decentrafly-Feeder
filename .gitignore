@@ -1,0 +1,7 @@
+/*.bin
+/certificate.pem
+/private.key
+/root-CA.crt
+decentrafly
+__pycache__
+decentrafly.zip

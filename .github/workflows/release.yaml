@@ -1,0 +1,45 @@
+name: Create and publish a binary
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-push-binary:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - run: |
+          set -euo pipefail
+          zip -r decentrafly.zip *.py requirements.txt
+          cat bootstrap decentrafly.zip > decentrafly
+      - name: version
+        run: echo "::set-output name=version::$(date +'%Y%m%d%H%M%S')"
+        id: version
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: decentrafly
+          asset_name: decentrafly
+          asset_content_type: application/zip
