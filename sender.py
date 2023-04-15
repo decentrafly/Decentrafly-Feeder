@@ -62,6 +62,7 @@ class Sender:
     def connect(self, host, port):
         print("Attempting connection to {}".format(host))
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(120)
         self.sock.connect((host, port))
         print("Connected to readsb")
 
