@@ -54,6 +54,7 @@ class Sender:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.decoder = beast.Decoder()
         self.last_forward = time.time()
+        self.connected = False
         self.messages_sent = 0
         self.bytes_received = 0
         self.bytes_forwarded = 0
@@ -64,19 +65,20 @@ class Sender:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(120)
         self.sock.connect((host, port))
-        print("Connected to readsb")
+        print("Connected to readsb!")
 
     def forward(self):
         if (self.decoder.bytes_available() > trigger_size
            or time.time() - self.last_forward > max_interval):
 
             next_message = self.decoder.up_to_bytes(100000)
-            self.mqtt_connection.publish(topic=aws_iot_topic,
-                                         payload=next_message,
-                                         qos=mqtt.QoS.AT_LEAST_ONCE)
-            self.messages_sent += 1
-            self.bytes_forwarded += len(next_message)
-            self.last_forward = time.time()
+            if next_message:
+                self.mqtt_connection.publish(topic=aws_iot_topic,
+                                             payload=next_message,
+                                             qos=mqtt.QoS.AT_LEAST_ONCE)
+                self.messages_sent += 1
+                self.bytes_forwarded += len(next_message)
+                self.last_forward = time.time()
 
     def maybe_log_informative(self):
         if time.time() - self.last_informative_log_at > log_interval:
@@ -95,7 +97,7 @@ class Sender:
                 self.connect(readsb_host, readsb_port)
                 connected = True
             except Exception:
-                print("Backing off.")
+                print("Connection failed. Backing off ...")
                 time.sleep(25)
             while connected:
                 try:

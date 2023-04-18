@@ -18,7 +18,8 @@ class Decoder:
     def finalize_frame(self, b):
         if self.in_prefix:
             self.in_prefix = False
-            print(len(self.current_frame))
+            print("BEAST: Dropped {} out-of-frame prefix bytes"
+                  .format(len(self.current_frame)))
         else:
             self.frames.append(self.current_frame)
         self.current_frame = bytearray([self.FRAME_BYTE, b])
@@ -34,6 +35,8 @@ class Decoder:
             self.finalize_frame(b)
         else:
             # RESET and ignore broken frame
+            print("BEAST: Dropping {} bytes because of broken frame format"
+                  .format(len(self.current_frame)))
             self.current_frame = bytearray()
             self.last_byte = -1
             self.in_prefix = True
