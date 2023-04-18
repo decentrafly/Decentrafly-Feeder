@@ -54,7 +54,6 @@ class Sender:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.decoder = beast.Decoder()
         self.last_forward = time.time()
-        self.connected = False
         self.messages_sent = 0
         self.bytes_received = 0
         self.bytes_forwarded = 0
@@ -92,6 +91,7 @@ class Sender:
             pass
 
     def run(self):
+        connected = False
         while True:
             try:
                 self.connect(readsb_host, readsb_port)
