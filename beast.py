@@ -2,10 +2,11 @@
 from io import FileIO
 
 class Decoder:
-    FRAME_BYTE   = 26
+    FRAME_BYTE = 26
     MODE_AC_BYTE = 49
-    MODE_S_BYTE  = 50
+    MODE_S_BYTE = 50
     MODE_SL_BYTE = 51
+    MODE_STAT_BYTE = 52
 
     def __init__(self):
         self.current_frame = bytearray()
@@ -28,7 +29,8 @@ class Decoder:
             self.current_frame.append(b)
         elif (b == self.MODE_AC_BYTE
               or b == self.MODE_S_BYTE
-              or b == self.MODE_SL_BYTE):
+              or b == self.MODE_SL_BYTE
+              or b == self.MODE_STAT_BYTE):
             self.finalize_frame(b)
         else:
             # RESET and ignore broken frame
