@@ -32,10 +32,11 @@ check_dependency pip3
 check_dependency python3
 check_dependency unzip
 
+cd "$(mktemp -d)"
 
-# curl ... > decentrafly
+curl -L 'https://github.com/decentrafly/MQTT/releases/download/v2023-04-18_2/decentrafly' > decentrafly
 echo "Checking file integrity"
-echo 'f12db7015d1e7f679c5830231c296e9c3ecc3318  decentrafly' | sha1sum --check
+echo '732191eba5a15afaf8b3318f23ebdab04e3207c7  decentrafly' | sha1sum --check
 
 chmod 777 decentrafly
 
