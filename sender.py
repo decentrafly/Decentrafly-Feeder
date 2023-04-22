@@ -1,5 +1,6 @@
 from awscrt import mqtt
 import beast
+import functools
 import json
 import os
 import pubsub
@@ -42,6 +43,23 @@ readsb_host = effective_config['DCF_READSB_HOST']
 readsb_port = int(effective_config['DCF_READSB_PORT'])
 trigger_size = int(effective_config["DCF_TRIGGER_SIZE"])
 
+
+@functools.lru_cache(1)
+def my_ip_addresses_at(only_passed_for_caching):
+    print("Updating sender IP address")
+    try:
+        my_ips_response = requests.request(
+            'GET',
+            "https://decentrafly.org/api/checkip/ip")
+        return my_ips_response.json()
+    except Exception:
+        return []
+
+
+def my_ip_addresses():
+    return my_ip_addresses_at(int(time.time()) // 180)
+
+
 class Sender:
     def __init__(self,
                  client_id,
@@ -83,10 +101,7 @@ class Sender:
 
     def update_device_state(self):
         try:
-            my_ips_response = requests.request('GET', "https://decentrafly.org/api/checkip/ip")
-            my_ips = my_ips_response.json()
-            print(my_ips)
-
+            my_ips = my_ip_addresses()
             self.mqtt_connection.publish(
                 topic="$aws/things/{}/shadow/update".format(self.client_id),
                 payload=json.dumps({"state":
