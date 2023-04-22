@@ -71,24 +71,25 @@ def self_setup():
 
 
 def enable_service(executable):
+    exit_code = 0
+
+    print("Please provide the sudo password to install the service")
+    exit_code += subprocess.call(['sudo', 'echo'])
     try:
-        if subprocess.call(['systemctl', '--user', 'status']) != 0:
-            print("Error: I need systemd-user to enable the service.")
+        if subprocess.call(['sudo', 'systemctl', 'status']) != 0:
+            print("Error: I need systemd to enable the service.")
             exit(1)
     except Exception:
         print("systemctl not found")
         exit(1)
 
-    print("Please provide the sudo password to install the service")
-    exit_code = 0
-    exit_code += subprocess.call(['sudo', 'echo'])
     with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
         tmp.write(systemd_service_file)
         tmp.close()
-        exit_code += subprocess.call(['sudo', 'mv', tmp.name, "/usr/lib/systemd/user/decentrafly.service"])
+        exit_code += subprocess.call(['sudo', 'mv', tmp.name, "/usr/lib/systemd/system/decentrafly.service"])
 
-    exit_code += subprocess.call(['systemctl', '--user', 'daemon-reload'])
-    exit_code += subprocess.call(['systemctl', '--user', 'enable', '--now', 'decentrafly.service'])
+    exit_code += subprocess.call(['sudo', 'systemctl', 'daemon-reload'])
+    exit_code += subprocess.call(['sudo', 'systemctl', 'enable', '--now', 'decentrafly.service'])
     if exit_code == 0:
         print("Done")
     else:
