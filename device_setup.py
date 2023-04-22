@@ -7,14 +7,12 @@ import tempfile
 import uuid
 
 
-systemd_service_file='''
-[Unit]
+systemd_service_file = '''[Unit]
 Description=MQTT Sender Service
 After=network.target
 
 [Service]
-WorkingDirectory=%h/.config/decentrafly
-ExecStart=decentrafly sender
+ExecStart=/usr/bin/decentrafly sender
 Restart=always
 RestartSec=10
 
@@ -76,7 +74,7 @@ def enable_service(executable):
     print("Please provide the sudo password to install the service")
     exit_code += subprocess.call(['sudo', 'echo'])
     try:
-        if subprocess.call(['sudo', 'systemctl', 'status']) != 0:
+        if subprocess.call(['sudo', 'which', 'systemctl']) != 0:
             print("Error: I need systemd to enable the service.")
             exit(1)
     except Exception:
