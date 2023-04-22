@@ -21,9 +21,9 @@ jobs:
           mkdir -p dependencies
           pip3 install --target=dependencies -r requirements.txt
           pushd dependencies
-          zip -r9 ../decentrafly.zip *
+          zip -r ../decentrafly.zip *
           popd
-          zip -r9 decentrafly.zip *.py requirements.txt
+          zip -r decentrafly.zip *.py requirements.txt
           cat bootstrap decentrafly.zip > decentrafly
       - name: version
         run: echo "::set-output name=version::$(date +'%Y%m%d%H%M%S')"
