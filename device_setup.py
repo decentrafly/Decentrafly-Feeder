@@ -33,7 +33,7 @@ def client_id():
     return "beastdatafeed-" + str(uuid.uuid4())
 
 
-def register_new_device(config_dir):
+def register_new_device(temporary_dir):
     thing_name = client_id()
     config_content = {"DCF_CLIENT_ID": thing_name,
                       "DCF_MQTT_HOST": "almfwrqpajske-ats.iot.us-east-1.amazonaws.com",
@@ -44,28 +44,28 @@ def register_new_device(config_dir):
                                 "https://decentrafly.org/api/device/register",
                                 json={"thing_name": thing_name})
     data = response.json()
-    write_to_file(os.path.expanduser("~/.config/decentrafly/cert.crt"), data['certs']['certificate'])
-    write_to_file(os.path.expanduser("~/.config/decentrafly/private.key"), data['certs']['private_key'])
-    write_to_file(os.path.expanduser("~/.config/decentrafly/ca.crt"), aws_root_ca.text)
-    write_to_file(os.path.expanduser("~/.config/decentrafly/config.json"),
-                                     json.dumps(config_content))
-
-
-def prepare_directories(config_dir):
-    if not os.path.exists(config_dir):
-        os.makedirs(config_dir)
+    write_to_file(os.path.join(temporary_dir, "cert.crt"), data['certs']['certificate'])
+    write_to_file(os.path.join(temporary_dir, "private.key"), data['certs']['private_key'])
+    write_to_file(os.path.join(temporary_dir, "ca.crt"), aws_root_ca.text)
+    write_to_file(os.path.join(temporary_dir, "config.json"),
+                  json.dumps(config_content, indent=2))
 
 
 def self_setup():
-    config_dir = os.path.expanduser("~/.config/decentrafly")
-
-    prepare_directories(config_dir)
-
-    if not (os.path.isfile(os.path.expanduser("~/.config/decentrafly/ca.crt"))
-            and os.path.isfile(os.path.expanduser("~/.config/decentrafly/cert.crt"))
-            and os.path.isfile(os.path.expanduser("~/.config/decentrafly/private.key"))):
-        register_new_device(config_dir)
-        print("Setup done")
+    if not (os.path.isfile(os.path.expanduser("/etc/decentrafly/ca.crt"))
+            and os.path.isfile(os.path.expanduser("/etc/decentrafly/cert.crt"))
+            and os.path.isfile(os.path.expanduser("/etc/decentrafly/private.key"))):
+        print("Please provide the sudo password to write config files to /etc/decentrafly")
+        exit_code = 0
+        exit_code += subprocess.call(['sudo', 'echo'])
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            register_new_device(tmpdirname)
+            exit_code += subprocess.call(['sudo', 'cp', '-r', tmpdirname, "/etc/decentrafly"])
+            exit_code += subprocess.call(['sudo', 'chmod', '755', tmpdirname, "/etc/decentrafly"])
+        if exit_code == 0:
+            print("Setup done")
+        else:
+            print("Setup failed")
     else:
         print("Setup already done")
 
