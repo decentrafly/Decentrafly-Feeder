@@ -10,7 +10,7 @@ import time
 
 
 def load_config():
-    config_file_path = os.path.expanduser("~/.config/decentrafly/config.json")
+    config_file_path = os.path.expanduser("/etc/decentrafly/config.json")
     if os.path.isfile(config_file_path):
         config = json.load(open(config_file_path))
         return config
@@ -46,13 +46,14 @@ trigger_size = int(effective_config["DCF_TRIGGER_SIZE"])
 
 @functools.lru_cache(1)
 def my_ip_addresses_at(only_passed_for_caching):
-    print("Updating sender IP address")
     try:
         my_ips_response = requests.request(
             'GET',
             "https://decentrafly.org/api/checkip/ip")
         return my_ips_response.json()
+        print("Updated IP address cache")
     except Exception:
+        print("Failed to update IP address, your device might appear as offline")
         return []
 
 
@@ -154,7 +155,7 @@ class Sender:
 
 def run():
     sender = Sender(client_id,
-                    os.path.expanduser("~/.config/decentrafly/cert.crt"),
-                    os.path.expanduser("~/.config/decentrafly/private.key"),
-                    os.path.expanduser("~/.config/decentrafly/ca.crt"))
+                    os.path.expanduser("/etc/decentrafly/cert.crt"),
+                    os.path.expanduser("/etc/decentrafly/private.key"),
+                    os.path.expanduser("/etc/decentrafly/ca.crt"))
     sender.run()
