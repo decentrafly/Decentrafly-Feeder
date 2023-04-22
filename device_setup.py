@@ -86,11 +86,20 @@ def enable_service(executable):
         tmp.write(systemd_service_file)
         tmp.close()
         exit_code += subprocess.call(['sudo', 'mv', tmp.name, "/usr/lib/systemd/user/decentrafly.service"])
-    if executable != '/usr/bin/decentrafly':
-        exit_code += subprocess.call(['sudo', 'cp', executable, '/usr/bin/decentrafly'])
-    exit_code += subprocess.call(['sudo', 'chmod', '777', '/usr/bin/decentrafly'])
+
     exit_code += subprocess.call(['systemctl', '--user', 'daemon-reload'])
     exit_code += subprocess.call(['systemctl', '--user', 'enable', '--now', 'decentrafly.service'])
+    if exit_code == 0:
+        print("Done")
+    else:
+        print("Failed")
+
+
+def install(executable):
+    exit_code = 0
+    if executable != '/usr/bin/decentrafly':
+        exit_code += subprocess.call(['sudo', 'cp', executable, '/usr/bin/decentrafly'])
+        exit_code += subprocess.call(['sudo', 'chmod', '777', '/usr/bin/decentrafly'])
     if exit_code == 0:
         print("Done")
     else:
