@@ -13,6 +13,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/decentrafly sender
+Environment="PYTHONUNBUFFERED=1"
 Restart=always
 RestartSec=10
 
