@@ -9,9 +9,10 @@ On Debian-based systems
 Missing  Install command
 -------  ---------------
 curl     sudo apt-get install curl
+env      sudo apt-get install coreutils
+mktemp   sudo apt-get install coreutils
 pip3     sudo apt-get install python3-pip
 python3  sudo apt-get install python3
-unzip    sudo apt-get install unzip
 
 HERE
 }
@@ -28,9 +29,9 @@ function check_dependency() {
 # Pre-Flight Checks
 check_dependency curl
 check_dependency env
+check_dependency mktemp
 check_dependency pip3
 check_dependency python3
-check_dependency unzip
 
 cd "$(mktemp -d)"
 
@@ -41,7 +42,7 @@ echo '732191eba5a15afaf8b3318f23ebdab04e3207c7  decentrafly' | sha1sum --check
 chmod 777 decentrafly
 
 echo "Installing dependencies ..."
-pip3 install $(unzip -p decentrafly requirements.txt)
+pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2
 
 ./decentrafly setup
 ./decentrafly enable
