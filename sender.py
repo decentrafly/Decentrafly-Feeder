@@ -1,10 +1,11 @@
+from awscrt import mqtt
 import beast
 import json
 import os
 import pubsub
+import requests
 import socket
 import time
-from awscrt import mqtt
 
 
 def load_config():
@@ -20,7 +21,7 @@ default_config = {
     "DCF_CLIENT_ID": "notset",
     "DCF_IOT_TOPIC": "beast/ingest/0",
     "DCF_LOG_INTERVAL": "20",
-    "DCF_MAX_INTERVAL": "1.5",
+    "DCF_MAX_INTERVAL": "1.0",
     "DCF_MAX_MESSAGE_SIZE": "100000",
     "DCF_READSB_HOST": "localhost",
     "DCF_READSB_PORT": "30005",
@@ -54,10 +55,11 @@ class Sender:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.decoder = beast.Decoder()
         self.last_forward = time.time()
+        self.client_id = client_id
         self.messages_sent = 0
         self.bytes_received = 0
         self.bytes_forwarded = 0
-        self.last_informative_log_at = 0
+        self.last_periodic_update_at = 0
 
     def connect(self, host, port):
         print("Attempting connection to {}".format(host))
@@ -79,14 +81,34 @@ class Sender:
                 self.bytes_forwarded += len(next_message)
                 self.last_forward = time.time()
 
-    def maybe_log_informative(self):
-        if time.time() - self.last_informative_log_at > log_interval:
-            self.last_informative_log_at = time.time()
-            print("bytes received {} | bytes forwarded {} | messages {}"
-                  .format(
-                      self.bytes_received,
-                      self.bytes_forwarded,
-                      self.messages_sent))
+    def update_device_state(self):
+        try:
+            my_ips_response = requests.request('GET', "https://decentrafly.org/api/checkip/ip")
+            my_ips = my_ips_response.json()
+            print(my_ips)
+
+            self.mqtt_connection.publish(
+                topic="$aws/things/{}/shadow/update".format(self.client_id),
+                payload=json.dumps({"state":
+                                    {"reported":
+                                     {"messages_sent": self.messages_sent,
+                                      "device_address": my_ips}}}),
+                qos=mqtt.QoS.AT_LEAST_ONCE)
+        except Exception:
+            print("Failed to update IoT device state :(")
+
+    def log_informative(self):
+        print("bytes received {} | bytes forwarded {} | messages {}"
+              .format(
+                  self.bytes_received,
+                  self.bytes_forwarded,
+                  self.messages_sent))
+
+    def maybe_periodic_update(self):
+        if time.time() - self.last_periodic_update_at > log_interval:
+            self.last_periodic_update_at = time.time()
+            self.log_informative()
+            self.update_device_state()
         else:
             pass
 
@@ -112,7 +134,7 @@ class Sender:
                 else:
                     connected = False
                     break
-                self.maybe_log_informative()
+                self.maybe_periodic_update()
 
 
 def run():
