@@ -18,6 +18,11 @@ jobs:
 
       - run: |
           set -euo pipefail
+          mkdir -p dependencies
+          pip3 install --target=dependencies -r requirements.txt
+          pushd dependencies
+          zip -r ../decentrafly.zip *
+          popd
           zip -r decentrafly.zip *.py requirements.txt
           cat bootstrap decentrafly.zip > decentrafly
       - name: version
