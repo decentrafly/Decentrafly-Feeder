@@ -1,6 +1,7 @@
 from random import randrange
 import json
 import os
+import re
 import requests
 import subprocess
 import tempfile
@@ -59,7 +60,7 @@ def parse_config_file(file_path):
                 line = line.strip()
                 if line and not line.startswith('#'):
                     key, value = line.split('=')
-                    config_dict[key.strip()] = value.strip()
+                    config_dict[key.strip()] = re.sub(r'[^a-zA-Z0-9_.,@/:#-]*', '', value.strip())
     return config_dict
 
 
@@ -88,7 +89,13 @@ def self_setup():
     if not (os.path.isfile(os.path.expanduser("/etc/decentrafly/ca.crt"))
             and os.path.isfile(os.path.expanduser("/etc/decentrafly/cert.crt"))
             and os.path.isfile(os.path.expanduser("/etc/decentrafly/private.key"))):
-        device_attributes = detect_device_attributes()
+
+        device_attributes = {}
+        try:
+            device_attributes = detect_device_attributes()
+        except Exception:
+            print("Unable to get device attributes, resuming without ...")
+
         print("\n\nPlease provide the sudo password to write config files to /etc/decentrafly")
         exit_code = 0
         exit_code += subprocess.call(['sudo', 'echo'])
