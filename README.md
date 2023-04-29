@@ -33,6 +33,12 @@ Confirm the MQTT status online at:
 
 https://decentrafly.org/checkip
 
+or 
+
+Check the MQTT Tar1090 map at:
+
+https://mqtt.decentrafly.org
+
 ## Log-Files
 
 To check the log files, use the following command:
@@ -43,7 +49,7 @@ sudo journalctl -fu decentrafly
 
 ## Getting-Help
 
-if you encounter any issues or need help with <Project Name>, please share your log files in our Discord community:
+if you encounter any issues or need help with the Decentrafly service, please share your log files in our Discord community:
 
 Join our Discord server: 
 
