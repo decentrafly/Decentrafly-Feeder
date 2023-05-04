@@ -61,6 +61,26 @@ Upload your log files and describe the issue you're experiencing.
 
 ## Appendix
 
+If you have not updated or installed pip3 follow these steps:
+
+<pre>
+sudo apt update
+</pre>
+
+
+<pre>
+sudo apt upgrade
+</pre>
+
+
+<pre>
+sudo apt install python3-pip
+</pre>
+
+<pre>
+pip --version
+</pre>
+
 Installation reads configuration file to set attributes for feeding at:
 
 <pre>
