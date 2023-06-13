@@ -95,7 +95,7 @@ class Sender:
             if next_message:
                 self.mqtt_connection.publish(topic=aws_iot_topic,
                                              payload=next_message,
-                                             qos=mqtt.QoS.AT_LEAST_ONCE)
+                                             qos=mqtt.QoS.AT_MOST_ONCE)
                 self.messages_sent += 1
                 self.bytes_forwarded += len(next_message)
                 self.last_forward = time.time()
@@ -109,7 +109,7 @@ class Sender:
                                     {"reported":
                                      {"messages_sent": self.messages_sent,
                                       "device_address": my_ips}}}),
-                qos=mqtt.QoS.AT_LEAST_ONCE)
+                qos=mqtt.QoS.AT_MOST_ONCE)
         except Exception:
             print("Failed to update IoT device state :(")
 

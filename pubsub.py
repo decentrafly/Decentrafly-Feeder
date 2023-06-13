@@ -56,7 +56,7 @@ def mqtt_connection_from_certfiles(client_id, cert_path, private_key_path, ca_pa
             on_connection_interrupted=on_connection_interrupted,
             on_connection_resumed=on_connection_resumed,
             client_id=client_id,
-            clean_session=False,
+            clean_session=True,
             keep_alive_secs=30)
     connect(conn)
     return conn
@@ -72,7 +72,7 @@ def mqtt_connection_from_certs(client_id, cert, private_key, ca):
             on_connection_interrupted=on_connection_interrupted,
             on_connection_resumed=on_connection_resumed,
             client_id=client_id,
-            clean_session=False,
+            clean_session=True,
             keep_alive_secs=30)
     connect(conn)
     return conn
