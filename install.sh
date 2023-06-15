@@ -37,7 +37,7 @@ cd "$(mktemp -d)"
 
 curl -L 'https://github.com/decentrafly/MQTT/releases/download/v2023-06-15/decentrafly' > decentrafly
 echo "Checking file integrity"
-echo '6d509793cb06d72a66facf5fd912fbfa77d575cf  decentrafly' | sha1sum --check
+echo 'ad3c46747de4b2893f9e7175df049a5b27fd5624  decentrafly' | sha1sum --check
 
 
 chmod 777 decentrafly
