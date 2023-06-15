@@ -45,6 +45,6 @@ chmod 777 decentrafly
 echo "Installing dependencies ..."
 sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2
 
-./decentrafly setup
+./decentrafly setup < /dev/tty
 ./decentrafly install
 ./decentrafly enable
