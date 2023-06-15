@@ -133,7 +133,6 @@ def enable_service(executable):
     if subprocess.call(['systemctl', 'is-active', '--quiet', 'decentrafly.service']) == 0:
         print("Restarting the service")
         exit_code += subprocess.call(['sudo', 'systemctl', 'restart', 'decentrafly.service'])
-        pass
     else:
         exit_code += subprocess.call(['sudo', 'systemctl', 'enable', '--now', 'decentrafly.service'])
     if exit_code == 0:
