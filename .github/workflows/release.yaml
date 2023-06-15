@@ -18,7 +18,8 @@ jobs:
 
       - run: |
           set -euo pipefail
-          zip -r decentrafly.zip *.py requirements.txt
+          git name-rev --tags HEAD | awk -F'[ /]' '{print $3}' > version.txt
+          zip -r decentrafly.zip *.py requirements.txt version.txt
           cat bootstrap decentrafly.zip > decentrafly
       - name: version
         run: echo "::set-output name=version::$(date +'%Y%m%d%H%M%S')"

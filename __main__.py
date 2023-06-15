@@ -32,6 +32,11 @@ def main():
         sender.run()
     elif command == "setup":
         device_setup.self_setup()
+    elif command == 'version':
+        with zipfile.ZipFile(executable) as z:
+            with z.open('version.txt') as zf:
+                print(zf.read().decode("utf-8").strip())
+
 
 
 if __name__ == '__main__':
