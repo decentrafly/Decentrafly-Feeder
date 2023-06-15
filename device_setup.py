@@ -108,7 +108,7 @@ def self_setup():
         else:
             print("Setup failed")
     else:
-        print("Setup already done")
+        print("Setup already done, I won't touch config or certificates")
 
 
 def enable_service(executable):
@@ -130,7 +130,12 @@ def enable_service(executable):
         exit_code += subprocess.call(['sudo', 'mv', tmp.name, "/usr/lib/systemd/system/decentrafly.service"])
 
     exit_code += subprocess.call(['sudo', 'systemctl', 'daemon-reload'])
-    exit_code += subprocess.call(['sudo', 'systemctl', 'enable', '--now', 'decentrafly.service'])
+    if subprocess.call(['systemctl', 'is-active', '--quiet', 'decentrafly.service']) == 0:
+        print("Restarting the service")
+        exit_code += subprocess.call(['sudo', 'systemctl', 'restart', 'decentrafly.service'])
+        pass
+    else:
+        exit_code += subprocess.call(['sudo', 'systemctl', 'enable', '--now', 'decentrafly.service'])
     if exit_code == 0:
         print("Done")
     else:
@@ -138,6 +143,8 @@ def enable_service(executable):
 
 
 def install(executable):
+    if os.path.isfile('/usr/bin/decentrafly'):
+        print("Found decentrafly on this machine, will upgrade ...")
     exit_code = 0
     if executable != '/usr/bin/decentrafly':
         exit_code += subprocess.call(['sudo', 'cp', executable, '/usr/bin/decentrafly'])
