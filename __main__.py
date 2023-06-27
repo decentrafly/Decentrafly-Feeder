@@ -20,7 +20,6 @@ def main():
     check_version.check()
 
     if command == "enable":
-        device_setup.install(executable)
         device_setup.enable_service(executable)
     elif command == "install":
         device_setup.install(executable)
