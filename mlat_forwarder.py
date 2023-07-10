@@ -164,5 +164,3 @@ def run():
     forwarder = MlatMtlsForwarder()
     forwarder.listen_plaintext("localhost", 41090)
     forwarder.run()
-
-run()

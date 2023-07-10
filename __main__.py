@@ -1,5 +1,6 @@
 import check_version
 import device_setup
+import mlat_forwarder
 import sender
 import sys
 import zipfile
@@ -24,7 +25,7 @@ def main():
     elif command == "install":
         device_setup.install(executable)
     elif command == "mlat-forwarder":
-        pass
+        mlat_forwarder.run()
     elif command == "requirements":
         with zipfile.ZipFile(executable) as z:
             with z.open('requirements.txt') as zf:
