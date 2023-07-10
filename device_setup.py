@@ -8,12 +8,26 @@ import tempfile
 import uuid
 
 
-systemd_service_file = '''[Unit]
+main_systemd_service_file = '''[Unit]
 Description=MQTT Sender Service
 After=network.target
 
 [Service]
 ExecStart=/usr/bin/decentrafly sender
+Environment="PYTHONUNBUFFERED=1"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+'''
+
+mlat_forwarder_systemd_service_file = '''[Unit]
+Description=MLAT mTLS Forwarder Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/decentrafly mlat-forwarder
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 RestartSec=10
@@ -111,7 +125,22 @@ def self_setup():
         print("Setup already done, I won't touch config or certificates")
 
 
-def enable_service(executable):
+def ensure_running_systemd_service(service):
+    if subprocess.call(['systemctl', 'is-active', '--quiet', service]) == 0:
+        print("Restarting the service {}".format(service))
+        return subprocess.call(['sudo', 'systemctl', 'restart', service])
+    else:
+        return subprocess.call(['sudo', 'systemctl', 'enable', '--now', service])
+
+
+def unpack_file(path, content):
+    with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
+        tmp.write(content)
+        tmp.close()
+        return subprocess.call(['sudo', 'mv', tmp.name, path])
+
+
+def enable_services(executable):
     exit_code = 0
 
     print("Please provide the sudo password to install the service")
@@ -124,17 +153,13 @@ def enable_service(executable):
         print("systemctl not found")
         exit(1)
 
-    with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
-        tmp.write(systemd_service_file)
-        tmp.close()
-        exit_code += subprocess.call(['sudo', 'mv', tmp.name, "/usr/lib/systemd/system/decentrafly.service"])
-
+    # Install the main forwarder service (MQTT)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-forwarder.service", mlat_forwarder_systemd_service_file)
     exit_code += subprocess.call(['sudo', 'systemctl', 'daemon-reload'])
-    if subprocess.call(['systemctl', 'is-active', '--quiet', 'decentrafly.service']) == 0:
-        print("Restarting the service")
-        exit_code += subprocess.call(['sudo', 'systemctl', 'restart', 'decentrafly.service'])
-    else:
-        exit_code += subprocess.call(['sudo', 'systemctl', 'enable', '--now', 'decentrafly.service'])
+    exit_code += ensure_running_systemd_service('decentrafly.service')
+    exit_code += ensure_running_systemd_service('decentrafly-mlat-forwarder.service')
+
     if exit_code == 0:
         print("Done")
     else:

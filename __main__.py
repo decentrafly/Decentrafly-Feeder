@@ -20,9 +20,11 @@ def main():
     check_version.check()
 
     if command == "enable":
-        device_setup.enable_service(executable)
+        device_setup.enable_services(executable)
     elif command == "install":
         device_setup.install(executable)
+    elif command == "mlat-forwarder":
+        pass
     elif command == "requirements":
         with zipfile.ZipFile(executable) as z:
             with z.open('requirements.txt') as zf:
@@ -35,7 +37,6 @@ def main():
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:
                 print(zf.read().decode("utf-8").strip())
-
 
 
 if __name__ == '__main__':
