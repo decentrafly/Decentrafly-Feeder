@@ -164,5 +164,5 @@ class MlatMtlsForwarder:
 def run():
     forwarder = MlatMtlsForwarder()
     forwarder.listen_plaintext(ec['DCF_MLAT_FORWARDER_BIND_ADDRESS'],
-                               ec['DCF_MLAT_FORWARDER_PORT'])
+                               int(ec['DCF_MLAT_FORWARDER_PORT']))
     forwarder.run()
