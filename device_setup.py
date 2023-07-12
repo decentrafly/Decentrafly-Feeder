@@ -45,6 +45,7 @@ def write_to_file(path, content):
 
 def register_new_device(temporary_dir, device_attributes):
     aws_root_ca = requests.request('GET', "https://www.amazontrust.com/repository/AmazonRootCA1.pem")
+    print("Generating a device ID and new certificates ...")
     response = requests.request('POST',
                                 "https://decentrafly.org/api/device/register/v2",
                                 json={"attributes": device_attributes})
@@ -88,7 +89,8 @@ def detect_device_attributes():
 
     if any(key not in adsb_config for key in required_keys):
         print("\nSome information about your device could not be detected automatically")
-        print("We kindly ask to provide this information, but you can leave it empty if you prefer.\n")
+        print("We kindly ask to provide this information, but you can leave it empty if you prefer.")
+        print("The information can help you manage your devices later.\n")
 
     for key in required_keys:
         if key not in adsb_config:
@@ -108,10 +110,12 @@ def self_setup():
         except Exception:
             print("Unable to get device attributes, resuming without ...")
 
-        print("\n\nPlease provide the sudo password to write config files to /etc/decentrafly")
+        print("\n\nI might ask for the sudo password to write config files to /etc/decentrafly")
         exit_code = 0
         exit_code += subprocess.call(['sudo', 'echo'])
+        print("OK")
         with tempfile.TemporaryDirectory() as tmpdirname:
+            print("Registering a new device with decentrafly, this might take up to a minute ...")
             register_new_device(tmpdirname, device_attributes)
             exit_code += subprocess.call(['sudo', 'cp', '-r', tmpdirname, "/etc/decentrafly"])
             exit_code += subprocess.call(['sudo', 'chmod', '755', tmpdirname, "/etc/decentrafly"])
