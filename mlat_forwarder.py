@@ -15,12 +15,13 @@ def load_config():
 
 
 default_config = {
-    'DCF_MLAT_CA_FILE': 'ca-root-crt.pem',
-    'DCF_MLAT_CLIENT_CRT_FILE': 'client1-crt.pem',
-    'DCF_MLAT_CLIENT_KEY_FILE': 'client1-key.pem',
-    'DCF_MLAT_MTLS_PORT': '41090',
+    'DCF_MLAT_CA_FILE': '/etc/decentrafly/ca-crt.pem',
+    'DCF_MLAT_CLIENT_CRT_FILE': '/etc/decentrafly/client-crt.pem',
+    'DCF_MLAT_CLIENT_KEY_FILE': '/etc/decentrafly/client-key.pem',
+    'DCF_MLAT_FORWARDER_BIND_ADDRESS': '0.0.0.0'
+    'DCF_MLAT_FORWARDER_PORT': '41090',
     'DCF_MLAT_SECURE_PORT': '31090',
-    'DCF_MLAT_SECURE_SERVER': 'localhost',
+    'DCF_MLAT_SECURE_SERVER': 'mlat.decentrafly.org',
     'DCF_MLAT_SECURE_SERVER_NAME': 'mlat.decentrafly.org',
     }
 
@@ -162,5 +163,6 @@ class MlatMtlsForwarder:
 
 def run():
     forwarder = MlatMtlsForwarder()
-    forwarder.listen_plaintext("localhost", 41090)
+    forwarder.listen_plaintext(ec['DCF_MLAT_FORWARDER_BIND_ADDRESS'],
+                               ec['DCF_MLAT_FORWARDER_PORT'])
     forwarder.run()
