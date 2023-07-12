@@ -15,10 +15,10 @@ def load_config():
 
 
 default_config = {
-    'DCF_MLAT_CA_FILE': '/etc/decentrafly/ca-crt.pem',
-    'DCF_MLAT_CLIENT_CRT_FILE': '/etc/decentrafly/client-crt.pem',
-    'DCF_MLAT_CLIENT_KEY_FILE': '/etc/decentrafly/client-key.pem',
-    'DCF_MLAT_FORWARDER_BIND_ADDRESS': '0.0.0.0'
+    'DCF_MLAT_CA_FILE': '/etc/decentrafly/mtls-ca.crt',
+    'DCF_MLAT_CLIENT_CRT_FILE': '/etc/decentrafly/mtls-cert.crt',
+    'DCF_MLAT_CLIENT_KEY_FILE': '/etc/decentrafly/mtls-private.key',
+    'DCF_MLAT_FORWARDER_BIND_ADDRESS': '0.0.0.0',
     'DCF_MLAT_FORWARDER_PORT': '41090',
     'DCF_MLAT_SECURE_PORT': '31090',
     'DCF_MLAT_SECURE_SERVER': 'mlat.decentrafly.org',

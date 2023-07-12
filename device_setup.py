@@ -43,25 +43,23 @@ def write_to_file(path, content):
     f.close()
 
 
-def client_id():
-    return "beastdatafeed-" + str(uuid.uuid4())
-
-
 def register_new_device(temporary_dir, device_attributes):
-    thing_name = client_id()
-    config_content = {"DCF_CLIENT_ID": thing_name,
-                      "DCF_MQTT_HOST": "almfwrqpajske-ats.iot.us-east-1.amazonaws.com",
-                      "DCF_IOT_TOPIC": "beast/ingest/" + str(randrange(1, 100))}
-
     aws_root_ca = requests.request('GET', "https://www.amazontrust.com/repository/AmazonRootCA1.pem")
     response = requests.request('POST',
-                                "https://decentrafly.org/api/device/register",
-                                json={"thing_name": thing_name,
-                                      "attributes": device_attributes})
+                                "https://decentrafly.org/api/device/register/v2",
+                                json={"attributes": device_attributes})
     data = response.json()
-    write_to_file(os.path.join(temporary_dir, "cert.crt"), data['certs']['certificate'])
-    write_to_file(os.path.join(temporary_dir, "private.key"), data['certs']['private_key'])
+    write_to_file(os.path.join(temporary_dir, "cert.crt"), data['mqtt']['certs']['certificate'])
+    write_to_file(os.path.join(temporary_dir, "private.key"), data['mqtt']['certs']['private_key'])
     write_to_file(os.path.join(temporary_dir, "ca.crt"), aws_root_ca.text)
+    write_to_file(os.path.join(temporary_dir, "mtls-cert.crt"), data['mtls']['certificate'])
+    write_to_file(os.path.join(temporary_dir, "mtls-private.key"), data['mtls']['private_key'])
+    write_to_file(os.path.join(temporary_dir, "mtls-ca.crt"), data['mtls']['ca'])
+
+    config_content = {"DCF_FEEDER_ID": data['feeder_id'],
+                      "DCF_CLIENT_ID": data['mqtt']['thing']['name'],
+                      "DCF_MQTT_HOST": "almfwrqpajske-ats.iot.us-east-1.amazonaws.com",
+                      "DCF_IOT_TOPIC": "beast/ingest/" + str(randrange(1, 100))}
     write_to_file(os.path.join(temporary_dir, "config.json"),
                   json.dumps(config_content, indent=2))
 
