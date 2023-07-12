@@ -36,6 +36,26 @@ RestartSec=10
 WantedBy=multi-user.target
 '''
 
+mlat_client_system_service_file = '''[Unit]
+Description=decentrafly-mlat-client
+Wants=network.target
+After=network.target
+After=decentrafly-mlat-forwarder.service
+
+[Service]
+EnvironmentFile=/boot/adsb-config.txt
+Environment=INPUT_TYPE=dump1090 "INPUT=127.0.0.1:30005" "MLATSERVER=localhost:41090"
+ExecStart=/usr/local/bin/mlat.sh
+Type=simple
+Restart=on-failure
+RestartSec=30
+RestartPreventExitStatus=64
+SyslogIdentifier=decentrafly-mlat-client
+
+[Install]
+WantedBy=default.target
+'''
+
 
 def write_to_file(path, content):
     f = open(os.path.expanduser(path), "w")
@@ -158,9 +178,11 @@ def enable_services(executable):
     # Install the main forwarder service (MQTT)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-forwarder.service", mlat_forwarder_systemd_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-client.service", mlat_client_system_service_file)
     exit_code += subprocess.call(['sudo', 'systemctl', 'daemon-reload'])
     exit_code += ensure_running_systemd_service('decentrafly.service')
     exit_code += ensure_running_systemd_service('decentrafly-mlat-forwarder.service')
+    exit_code += ensure_running_systemd_service('decentrafly-mlat-client.service')
 
     if exit_code == 0:
         print("Done")
