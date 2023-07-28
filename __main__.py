@@ -13,7 +13,7 @@ log.debug("Entry point")
 
 
 def help():
-    print("Specify a command: (setup|sender|enable)")
+    print("Specify a command: (agent|enable|install|mlat-forwarder|requirements|sender|setup|version)")
 
 
 def main():
