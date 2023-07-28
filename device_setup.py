@@ -5,7 +5,6 @@ import re
 import requests
 import subprocess
 import tempfile
-import uuid
 
 
 main_systemd_service_file = '''[Unit]
