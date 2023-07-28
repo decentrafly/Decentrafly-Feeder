@@ -107,36 +107,7 @@ class Sender:
         else:
             pass
 
-    def secure_tunnel_request(self, payload):
-        request = json.loads(payload)
-        if "destination" != request['clientMode']:
-            logger.error("Remote requested secure tunnel with mode %s", request['clientMode'])
-            return
-        if ["SSH"] != request['services']:
-            logger.error("Remote requested secure tunnel for services %s", request['services'])
-            return
-
-        logger.info("Initiating remote access secure tunnel")
-        subprocess.Popen(["localproxy",
-                          "-t", request['clientAccessToken'],
-                          "-r", request['region'],
-                          "-d", "localhost:22"])
-
-    def listen_for_remote_access_request(self):
-        topic = "$aws/things/{}/tunnels/notify".format(self.client_id)
-        subscribe_future, packet_id = self.mqtt_connection.subscribe(
-            topic=topic,
-            qos=mqtt.QoS.AT_MOST_ONCE,
-            callback=lambda topic, payload, dup, qos, retain, **kwargs:
-            self.secure_tunnel_request(payload))
-        subscribe_result = subscribe_future.result()
-        print("Subscribed to {} with {}".format(topic, str(subscribe_result['qos'])))
-
     def run(self):
-        if effective_config['DCF_REMOTE_ACCESS']:
-            logger.info("Remote access is enabled!")
-            self.listen_for_remote_access_request()
-
         connected = False
         while True:
             try:
