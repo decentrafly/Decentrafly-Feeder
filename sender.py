@@ -8,7 +8,6 @@ import os
 import pubsub
 import requests
 import socket
-import subprocess
 import time
 
 logger = logging.getLogger("sender")

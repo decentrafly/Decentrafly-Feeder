@@ -64,6 +64,3 @@ def run():
         logger.info("Remote access is turned off.")
         while True:
             time.sleep(600)
-
-
-run()

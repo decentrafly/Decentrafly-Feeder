@@ -1,9 +1,15 @@
+import agent
 import check_version
 import device_setup
+import logging
 import mlat_forwarder
 import sender
 import sys
 import zipfile
+
+
+log = logging.getLogger("__main__")
+log.debug("Entry point")
 
 
 def help():
@@ -12,6 +18,7 @@ def help():
 
 def main():
     args = sys.argv
+    log.debug("Command line arguments: %s", args)
     if len(args) < 2:
         help()
         exit(1)
@@ -20,7 +27,9 @@ def main():
 
     check_version.check()
 
-    if command == "enable":
+    if command == "agent":
+        agent.run()
+    elif command == "enable":
         device_setup.enable_services(executable)
     elif command == "install":
         device_setup.install(executable)

@@ -2,7 +2,10 @@ import json
 import logging
 import os
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+
+loglevel = os.environ.get('LOGLEVEL', 'INFO').upper()
+logging.basicConfig(level=loglevel, format='%(message)s')
+
 
 def load_config():
     config_file_path = os.path.expanduser("/etc/decentrafly/config.json")
