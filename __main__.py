@@ -13,7 +13,7 @@ log.debug("Entry point")
 
 
 def help():
-    print("Specify a command: (agent|enable|install|mlat-forwarder|requirements|sender|setup|version)")
+    print("Specify a command: (agent|enable|install|mlat-forwarder|requirements|sender|setup|upgrade|version)")
 
 
 def main():
@@ -47,6 +47,8 @@ def main():
         device_setup.self_setup()
     elif command == "setup-agent":
         device_setup.setup_agent()
+    elif command == "upgrade":
+        device_setup.upgrade(executable)
     elif command == 'version':
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:

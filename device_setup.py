@@ -1,5 +1,6 @@
 from random import randrange
 import config
+import hashlib
 import json
 import os
 import re
@@ -75,6 +76,16 @@ def write_to_file(path, content):
     f = open(os.path.expanduser(path), "w")
     f.write(content)
     f.close()
+
+
+def check_setup_dependencies():
+    try:
+        if subprocess.call(['sudo', 'which', 'systemctl']) != 0:
+            print("Error: I need systemd to enable the service.")
+            exit(1)
+    except Exception:
+        print("systemctl not found")
+        exit(1)
 
 
 def register_new_device(temporary_dir, device_attributes):
@@ -188,15 +199,9 @@ def download_file(path, url):
 def enable_services(executable):
     exit_code = 0
 
+    check_setup_dependencies()
     print("Please provide the sudo password to install the service")
     exit_code += subprocess.call(['sudo', 'echo'])
-    try:
-        if subprocess.call(['sudo', 'which', 'systemctl']) != 0:
-            print("Error: I need systemd to enable the service.")
-            exit(1)
-    except Exception:
-        print("systemctl not found")
-        exit(1)
 
     # Install the main forwarder service (MQTT)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
@@ -239,8 +244,18 @@ def install_agent():
 
 
 def setup_agent():
+    check_setup_dependencies()
     if (ensure_running_systemd_service("decentrafly-agent.service")
         + config.persist_config_entry("DCF_REMOTE_ACCESS", "True")) == 0:
+        print("Done")
+    else:
+        print("Failed")
+
+
+def upgrade(executable):
+    url = "https://github.com/decentrafly/MQTT-Feeder/releases/latest/download/decentrafly"
+    if download_file(executable, url) == 0:
+        subprocess.call(['sudo', 'chmod', '777', executable])
         print("Done")
     else:
         print("Failed")
