@@ -1,4 +1,5 @@
 from random import randrange
+import config
 import json
 import os
 import re
@@ -176,7 +177,8 @@ def unpack_file(path, content):
 
 
 def download_file(path, url):
-    with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
+    with tempfile.NamedTemporaryFile("wb", delete=False) as tmp:
+        print("Downloading {} ...".format(url))
         resp = requests.get(url, allow_redirects=True)
         tmp.write(resp.content)
         tmp.close()
@@ -237,7 +239,8 @@ def install_agent():
 
 
 def setup_agent():
-    if ensure_running_systemd_service("decentrafly-agent.service") == 0:
+    if (ensure_running_systemd_service("decentrafly-agent.service")
+        + config.persist_config_entry("DCF_REMOTE_ACCESS", "True")) == 0:
         print("Done")
     else:
         print("Failed")
