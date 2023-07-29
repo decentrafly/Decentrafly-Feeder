@@ -33,6 +33,8 @@ def main():
         device_setup.enable_services(executable)
     elif command == "install":
         device_setup.install(executable)
+    elif command == "install-agent":
+        device_setup.install_agent()
     elif command == "mlat-forwarder":
         mlat_forwarder.run()
     elif command == "requirements":
@@ -43,6 +45,8 @@ def main():
         sender.run()
     elif command == "setup":
         device_setup.self_setup()
+    elif command == "setup-agent":
+        device_setup.setup_agent()
     elif command == 'version':
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:

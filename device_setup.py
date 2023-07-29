@@ -55,6 +55,20 @@ SyslogIdentifier=decentrafly-mlat-client
 WantedBy=default.target
 '''
 
+decentrafly_agent_systemd_service_file = '''[Unit]
+Description=Decentrafly Agent Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/decentrafly agent
+Environment="PYTHONUNBUFFERED=1"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+'''
+
 
 def write_to_file(path, content):
     f = open(os.path.expanduser(path), "w")
@@ -161,6 +175,14 @@ def unpack_file(path, content):
         return subprocess.call(['sudo', 'mv', tmp.name, path])
 
 
+def download_file(path, url):
+    with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
+        resp = requests.get(url, allow_redirects=True)
+        tmp.write(resp.content)
+        tmp.close()
+        return subprocess.call(['sudo', 'mv', tmp.name, path])
+
+
 def enable_services(executable):
     exit_code = 0
 
@@ -197,6 +219,25 @@ def install(executable):
         exit_code += subprocess.call(['sudo', 'cp', executable, '/usr/bin/decentrafly'])
         exit_code += subprocess.call(['sudo', 'chmod', '777', '/usr/bin/decentrafly'])
     if exit_code == 0:
+        print("Done")
+    else:
+        print("Failed")
+
+
+def install_agent():
+    localproxy_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm32/localproxy"
+    exit_code = 0
+    exit_code += download_file("/usr/bin/localproxy", localproxy_url)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-agent.service",
+                             decentrafly_agent_systemd_service_file)
+    if exit_code == 0:
+        print("Done")
+    else:
+        print("Failed")
+
+
+def setup_agent():
+    if ensure_running_systemd_service("decentrafly-agent.service") == 0:
         print("Done")
     else:
         print("Failed")
