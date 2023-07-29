@@ -245,8 +245,13 @@ def install_agent():
 
 def setup_agent():
     check_setup_dependencies()
-    if (ensure_running_systemd_service("decentrafly-agent.service")
-        + config.persist_config_entry("DCF_REMOTE_ACCESS", "True")) == 0:
+    if not (os.path.isfile("/usr/bin/localproxy")
+            and os.path.isfile("/usr/lib/systemd/system/decentrafly-agent.service")):
+        install_agent()
+    exit_code = 0
+    exit_code += config.persist_config_entry("DCF_REMOTE_ACCESS", "True")
+    exit_code += ensure_running_systemd_service("decentrafly-agent.service")
+    if exit_code == 0:
         print("Done")
     else:
         print("Failed")
