@@ -1,6 +1,5 @@
 from random import randrange
 import config
-import hashlib
 import json
 import os
 import re
@@ -170,6 +169,18 @@ def self_setup():
             print("Setup failed")
     else:
         print("Setup already done, I won't touch config or certificates")
+
+
+def update_iot_device():
+    up_to_date_config = config.load_config()
+    if up_to_date_config['DCF_CLIENT_ID']:
+        requests.request(
+            'POST',
+            "https://decentrafly.org/api/device/update",
+            json={"thing_name": up_to_date_config['DCF_CLIENT_ID']}
+        )
+    else:
+        print("Update iot device failed.")
 
 
 def ensure_running_systemd_service(service):

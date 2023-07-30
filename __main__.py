@@ -45,6 +45,7 @@ def main():
         sender.run()
     elif command == "setup":
         device_setup.self_setup()
+        device_setup.update_iot_device()
     elif command == "setup-agent":
         device_setup.setup_agent()
     elif command == "upgrade":
