@@ -177,6 +177,7 @@ def update_iot_device():
     # not up to date as currently it's only loaded on startup
     up_to_date_config = config.load_config()
     if up_to_date_config['DCF_CLIENT_ID']:
+        print("Updating device configuration on decentrafly backend ...")
         requests.request(
             'POST',
             "https://decentrafly.org/api/device/update",
