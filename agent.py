@@ -15,7 +15,7 @@ class Agent:
                  cert_path,
                  private_key_path,
                  ca_path):
-        self.mqtt_connection = pubsub.mqtt_connection_from_certfiles(client_id + "-agent",
+        self.mqtt_connection = pubsub.mqtt_connection_from_certfiles(client_id,
                                                                      cert_path,
                                                                      private_key_path,
                                                                      ca_path)
@@ -55,7 +55,7 @@ class Agent:
 def run():
     if ('DCF_REMOTE_ACCESS' in effective_config and effective_config['DCF_REMOTE_ACCESS'] == "True"):
         logger.info("Remote access is enabled!")
-        agent = Agent(effective_config['DCF_CLIENT_ID'],
+        agent = Agent(effective_config['DCF_CLIENT_ID'] + "-agent",
                       "/etc/decentrafly/cert.crt",
                       "/etc/decentrafly/private.key",
                       "/etc/decentrafly/ca.crt")
