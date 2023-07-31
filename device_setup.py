@@ -172,6 +172,9 @@ def self_setup():
 
 
 def update_iot_device():
+    # We load the config directly from file, because this happens in
+    # the same run as the self_setup. So config.effective_config is
+    # not up to date as currently it's only loaded on startup
     up_to_date_config = config.load_config()
     if up_to_date_config['DCF_CLIENT_ID']:
         requests.request(
