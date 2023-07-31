@@ -15,7 +15,7 @@ class Agent:
                  cert_path,
                  private_key_path,
                  ca_path):
-        self.mqtt_connection = pubsub.mqtt_connection_from_certfiles("agent-" + client_id,
+        self.mqtt_connection = pubsub.mqtt_connection_from_certfiles(client_id + "-agent",
                                                                      cert_path,
                                                                      private_key_path,
                                                                      ca_path)
