@@ -202,13 +202,15 @@ def unpack_file(path, content):
         return subprocess.call(['sudo', 'mv', tmp.name, path])
 
 
-def download_file(path, url):
+def download_file(path, url, chmod=None):
     with tempfile.NamedTemporaryFile("wb", delete=False) as tmp:
         print("Downloading {} ...".format(url))
         resp = requests.get(url, allow_redirects=True)
         tmp.write(resp.content)
         tmp.close()
-        return subprocess.call(['sudo', 'mv', tmp.name, path])
+        if chmod:
+            exit_code = subprocess.call(['sudo', 'chmod', chmod, tmp.name])
+        return exit_code + subprocess.call(['sudo', 'mv', tmp.name, path])
 
 
 def enable_services(executable):
@@ -249,7 +251,7 @@ def install(executable):
 def install_agent():
     localproxy_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm32/localproxy"
     exit_code = 0
-    exit_code += download_file("/usr/bin/localproxy", localproxy_url)
+    exit_code += download_file("/usr/bin/localproxy", localproxy_url, "777")
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-agent.service",
                              decentrafly_agent_systemd_service_file)
     if exit_code == 0:
