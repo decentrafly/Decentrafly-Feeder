@@ -209,6 +209,7 @@ def download_file(path, url, chmod=None):
         resp = requests.get(url, allow_redirects=True)
         tmp.write(resp.content)
         tmp.close()
+        exit_code = 0
         if chmod:
             exit_code = subprocess.call(['sudo', 'chmod', chmod, tmp.name])
         return exit_code + subprocess.call(['sudo', 'mv', tmp.name, path])
@@ -276,8 +277,7 @@ def setup_agent():
 
 def upgrade(executable):
     url = "https://github.com/decentrafly/MQTT-Feeder/releases/latest/download/decentrafly"
-    if download_file(executable, url) == 0:
-        subprocess.call(['sudo', 'chmod', '777', executable])
+    if download_file(executable, url, "777") == 0:
         print("Done")
     else:
         print("Failed")
