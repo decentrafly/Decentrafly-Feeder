@@ -6,7 +6,6 @@ import subprocess
 
 
 loglevel = os.environ.get('LOGLEVEL', 'INFO').upper()
-logging.basicConfig(level=loglevel, format='%(message)s')
 config_file_path = os.path.expanduser("/etc/decentrafly/config.json")
 
 
@@ -32,18 +31,33 @@ def persist_config_entry(k, v):
                                                       indent=2))
 
 
+def basic_logging():
+    logging.basicConfig(level=loglevel, format='%(message)s')
+
 default_config = {
+    "DCF_LOG_INTERVAL": "20",
+
+    "DCF_CA_FILE": '/etc/decentrafly/mtls-ca.crt',
+    "DCF_CLIENT_CRT_FILE": '/etc/decentrafly/mtls-cert.crt',
+    "DCF_CLIENT_KEY_FILE": '/etc/decentrafly/mtls-private.key',
+
     "DCF_CLIENT_ID": "notset",
     "DCF_IOT_TOPIC": "beast/ingest/0",
-    "DCF_LOG_INTERVAL": "20",
     "DCF_MAX_INTERVAL": "1.0",
     "DCF_MAX_MESSAGE_SIZE": "100000",
+    "DCF_TRIGGER_SIZE": "50000",
+
     "DCF_READSB_HOST": "localhost",
     "DCF_READSB_PORT": "30005",
-    "DCF_TRIGGER_SIZE": "50000",
+
+    "DCF_SECURE_ADSB_HOST": "localhost",
+    "DCF_SECURE_ADSB_PORT": "40004",
     }
 
 environment_config = {k: os.getenv(k) for k in default_config.keys()
                       if os.getenv(k) is not None}
 
 effective_config = {**default_config, **load_config(), **environment_config}
+
+def ec(k):
+    return effective_config.get(k.upper())
