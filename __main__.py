@@ -1,4 +1,5 @@
 import agent
+import adsb_forwarder
 import check_version
 import device_setup
 import logging
@@ -13,7 +14,7 @@ log.debug("Entry point")
 
 
 def help():
-    print("Specify a command: (agent|enable|install|mlat-forwarder|requirements|sender|setup|upgrade|version)")
+    print("Specify a command: (adsb-forwarder|agent|enable|install|mlat-forwarder|requirements|sender|setup|upgrade|version)")
 
 
 def main():
@@ -27,7 +28,9 @@ def main():
 
     check_version.check()
 
-    if command == "agent":
+    if command == "adsb-forwarder":
+        adsb_forwarder.run()
+    elif command == "agent":
         agent.run()
     elif command == "enable":
         device_setup.enable_services(executable)

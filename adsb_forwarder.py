@@ -48,16 +48,19 @@ async def start_forwarder():
         remote_reader, remote_writer = await forwarding_connection_future
     except Exception:
         logger.error("Failed to connect to secure remote")
+        exit(2)
 
     try:
         local_reader, local_writer = await reading_connection_future
     except Exception:
         logger.error("Failed to connect to readsb")
+        exit(2)
 
     fw = pipe(local_reader, remote_writer)
     bw = pipe(remote_reader, local_writer)
 
     try:
+        logger.info("Forwarding!")
         await asyncio.gather(fw, bw)
     except Exception:
         logger.error("Connection failed")
@@ -67,4 +70,5 @@ async def start_forwarder():
     logger.info("Exiting")
 
 
-asyncio.run(start_forwarder())
+def run():
+    asyncio.run(start_forwarder())
