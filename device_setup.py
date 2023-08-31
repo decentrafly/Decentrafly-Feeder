@@ -22,6 +22,20 @@ RestartSec=10
 WantedBy=multi-user.target
 '''
 
+adsb_forwarder_systemd_service_file = '''[Unit]
+Description=Secure ADSB Forwarder Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/decentrafly adsb-forwarder
+Environment="PYTHONUNBUFFERED=1"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+'''
+
 mlat_forwarder_systemd_service_file = '''[Unit]
 Description=MLAT mTLS Forwarder Service
 After=network.target
@@ -196,6 +210,13 @@ def ensure_running_systemd_service(service):
         return exit_code + subprocess.call(['sudo', 'systemctl', 'enable', '--now', service])
 
 
+def ensure_off_systemd_service(service):
+    exit_code = subprocess.call(['sudo', 'systemctl', 'daemon-reload'])
+    if subprocess.call(['systemctl', 'is-active', '--quiet', service]) == 0:
+        return exit_code + subprocess.call(['sudo', 'systemctl', 'disable', '--now', service])
+    return exit_code
+
+
 def unpack_file(path, content):
     with tempfile.NamedTemporaryFile("w", delete=False) as tmp:
         tmp.write(content)
@@ -224,9 +245,11 @@ def enable_services(executable):
 
     # Install the main forwarder service (MQTT)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-adsb-forwarder.service", adsb_forwarder_systemd_service_file)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-forwarder.service", mlat_forwarder_systemd_service_file)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-client.service", mlat_client_system_service_file)
-    exit_code += ensure_running_systemd_service('decentrafly.service')
+    exit_code += ensure_off_systemd_service('decentrafly.service')
+    exit_code += ensure_running_systemd_service('decentrafly-adsb-forwarder.service')
     exit_code += ensure_running_systemd_service('decentrafly-mlat-forwarder.service')
     exit_code += ensure_running_systemd_service('decentrafly-mlat-client.service')
 
