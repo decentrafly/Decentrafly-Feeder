@@ -1,16 +1,11 @@
 from config import ec
 import asyncio
-import json_logging
 import logging
 import ssl
-import sys
 
 
-# Set up our own json logging
-json_logging.init_non_web(enable_json=True)
 logger = logging.getLogger("main")
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler(sys.stdout))
 logger.info("Logger initialized")
 
 

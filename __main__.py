@@ -1,14 +1,9 @@
-import agent
-import adsb_forwarder
+import config
 import check_version
-import device_setup
 import logging
-import mlat_forwarder
-import sender
 import sys
-import zipfile
 
-
+config.basic_logging()
 log = logging.getLogger("__main__")
 log.debug("Entry point")
 
@@ -26,8 +21,18 @@ def main():
     executable = args[0]
     command = args[1]
 
+    log.debug("Checking if we are running a sufficiently new python")
     check_version.check()
 
+    log.debug("Import commands code")
+    import adsb_forwarder
+    import agent
+    import device_setup
+    import mlat_forwarder
+    import sender
+    import zipfile
+
+    log.debug("Dispatch")
     if command == "adsb-forwarder":
         adsb_forwarder.run()
     elif command == "agent":
@@ -58,6 +63,7 @@ def main():
             with z.open('version.txt') as zf:
                 print(zf.read().decode("utf-8").strip())
 
+    log.debug("Terminating")
 
 if __name__ == '__main__':
     main()
