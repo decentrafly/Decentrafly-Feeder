@@ -21,6 +21,7 @@ def ssl_context():
     context.check_hostname = True
     context.load_cert_chain(ec('DCF_CLIENT_CRT_FILE'),
                             keyfile=ec('DCF_CLIENT_KEY_FILE'))
+    return context
 
 
 async def pipe(reader, writer):
@@ -35,8 +36,9 @@ async def start_forwarder():
     context = ssl_context()
     logger.info("Connecting ...")
     forwarding_connection_future = asyncio.open_connection(
-        ec('DCF_SECURE_ADSB_HOST'),
-        int(ec('DCF_SECURE_ADSB_PORT')),
+        host=ec('DCF_SECURE_ADSB_HOST'),
+        port=int(ec('DCF_SECURE_ADSB_PORT')),
+        server_hostname=ec('DCF_SECURE_ADSB_HOSTNAME'),
         ssl=context
     )
     reading_connection_future = asyncio.open_connection(
@@ -46,8 +48,9 @@ async def start_forwarder():
 
     try:
         remote_reader, remote_writer = await forwarding_connection_future
-    except Exception:
+    except Exception as e:
         logger.error("Failed to connect to secure remote")
+        logger.error(e)
         exit(2)
 
     try:

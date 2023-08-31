@@ -52,6 +52,7 @@ default_config = {
 
     "DCF_SECURE_ADSB_HOST": "localhost",
     "DCF_SECURE_ADSB_PORT": "40004",
+    "DCF_SECURE_ADSB_HOSTNAME": "feed.decentrafly.org",
     }
 
 environment_config = {k: os.getenv(k) for k in default_config.keys()
