@@ -6,7 +6,6 @@ import ssl
 
 logger = logging.getLogger("main")
 logger.setLevel(logging.INFO)
-logger.info("Logger initialized")
 
 
 def ssl_context():
