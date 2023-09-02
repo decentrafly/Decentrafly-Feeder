@@ -43,7 +43,7 @@ echo '07d0558a5b28337078c0bae30d25e6a7813a55fc  decentrafly' | sha1sum --check
 chmod 777 decentrafly
 
 echo "Installing dependencies ..."
-sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2
+sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2 asyncio==3.4.3
 
 ./decentrafly setup < /dev/tty
 ./decentrafly install
