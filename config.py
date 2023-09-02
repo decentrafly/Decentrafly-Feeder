@@ -23,6 +23,10 @@ def load_config():
     else:
         return {}
 
+def write_config(updated_config):
+    write_to_file(config_file_path,
+                  json.dumps(updated_config, indent=2))
+
 
 def persist_config_entry(k, v):
     current_config = load_config()
@@ -49,6 +53,8 @@ default_config = {
 
     "DCF_READSB_HOST": "localhost",
     "DCF_READSB_PORT": "30005",
+
+    "DCF_MAIN_DOMAIN": "api.decentrafly.org",
 
     "DCF_SECURE_ADSB_HOST": "localhost",
     "DCF_SECURE_ADSB_PORT": "40004",

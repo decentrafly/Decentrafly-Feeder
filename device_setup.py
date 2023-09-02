@@ -101,6 +101,20 @@ def check_setup_dependencies():
         exit(1)
 
 
+def check_sudo_to(reason):
+    for x in range(3):
+        print("\n\nI might ask for the sudo password to " + reason)
+        exit_code = 0
+        exit_code += subprocess.call(['sudo', 'echo'])
+        if exit_code == 0:
+            print("OK")
+            return
+        else:
+            print("Failed to obtain root access")
+    print("Failed. Exiting.")
+    exit(2)
+
+
 def register_new_device(temporary_dir, device_attributes):
     aws_root_ca = requests.request('GET', "https://www.amazontrust.com/repository/AmazonRootCA1.pem")
     print("Generating a device ID and new certificates ...")
@@ -168,10 +182,7 @@ def self_setup():
         except Exception:
             print("Unable to get device attributes, resuming without ...")
 
-        print("\n\nI might ask for the sudo password to write config files to /etc/decentrafly")
-        exit_code = 0
-        exit_code += subprocess.call(['sudo', 'echo'])
-        print("OK")
+        check_sudo_to("write config files to /etc/decentrafly")
         with tempfile.TemporaryDirectory() as tmpdirname:
             print("Registering a new device with decentrafly, this might take up to a minute ...")
             register_new_device(tmpdirname, device_attributes)
@@ -240,8 +251,7 @@ def enable_services(executable):
     exit_code = 0
 
     check_setup_dependencies()
-    print("Please provide the sudo password to install the service")
-    exit_code += subprocess.call(['sudo', 'echo'])
+    check_sudo_to("install the service")
 
     # Install the main forwarder service (MQTT)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
@@ -304,3 +314,15 @@ def upgrade(executable):
         print("Done")
     else:
         print("Failed")
+
+
+def update_config():
+    url = "https://" + config.ec('DCF_MAIN_DOMAIN') + "/api/devices/config"
+    response = requests.request('GET', url)
+    updated_config = {
+        **(config.load_config()),
+        **(response.json())
+    }
+    check_sudo_to("update the config file in /etc/decentrafly")
+    config.write_config(updated_config)
+    print("Updated config")

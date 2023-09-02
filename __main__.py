@@ -56,8 +56,11 @@ def main():
         device_setup.update_iot_device()
     elif command == "setup-agent":
         device_setup.setup_agent()
+    elif command == "update-config":
+        device_setup.update_config()
     elif command == "upgrade":
         device_setup.upgrade(executable)
+        device_setup.update_config()
     elif command == 'version':
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:
