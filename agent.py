@@ -1,13 +1,16 @@
 from awscrt import mqtt
-from config import effective_config
+from config import effective_config, ec
+import asyncio
 import json
 import logging
 import pubsub
+import requests
 import subprocess
 import time
 
 logger = logging.getLogger("agent")
 
+TOPIC_DEVICE_INFO = '$aws/rules/feeder/device-info'
 
 class Agent:
     def __init__(self,
@@ -46,10 +49,38 @@ class Agent:
         subscribe_result = subscribe_future.result()
         logger.info("Subscribed to {} with qos {}".format(topic, str(subscribe_result['qos'])))
 
+    async def update_ip_information(self):
+        while True:
+            try:
+                device_ips_response = requests.request('GET', "https://" + ec('DCF_MAIN_DOMAIN') + '/api/devices/peer')
+                device_ips = device_ips_response.json()
+                self.mqtt_connection.publish(
+                    topic=TOPIC_DEVICE_INFO,
+                    payload=json.dumps(
+                        {
+                            "device":
+                            {
+                                "ips": device_ips,
+                                "id": ec('DCF_FEEDER_IF')
+                            }
+                        }
+                    ),
+                    qos=mqtt.QoS.AT_MOST_ONCE)
+                print("Updated device info")
+            except Exception:
+                print("Failed to update device info")
+            finally:
+                await asyncio.sleep(60)
+
     def run(self):
         self.listen_for_remote_access_request()
-        while True:
-            time.sleep(600)
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(self.update_ip_information())
+
+        try:
+            loop.run_until_complete(task)
+        except asyncio.CancelledError:
+            pass
 
 
 def run():
