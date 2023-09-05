@@ -1,16 +1,17 @@
 from awscrt import mqtt
 from config import effective_config, ec
+from ip import get_device_ips
 import asyncio
 import json
 import logging
 import pubsub
-import requests
 import subprocess
 import time
 
 logger = logging.getLogger("agent")
 
-TOPIC_DEVICE_INFO = '$aws/rules/feeder/device-info'
+TOPIC_DEVICE_INFO = '$aws/rules/prod_feeder/device/info'
+
 
 class Agent:
     def __init__(self,
@@ -52,25 +53,22 @@ class Agent:
     async def update_ip_information(self):
         while True:
             try:
-                device_ips_response = requests.request('GET', "https://" + ec('DCF_MAIN_DOMAIN') + '/api/devices/peer')
-                device_ips = device_ips_response.json()
+                device_ips = get_device_ips()
                 self.mqtt_connection.publish(
                     topic=TOPIC_DEVICE_INFO,
                     payload=json.dumps(
                         {
-                            "device":
-                            {
-                                "ips": device_ips,
-                                "id": ec('DCF_FEEDER_IF')
-                            }
+                            "device_id": ec('DCF_FEEDER_ID'),
+                            "ip": device_ips[0],
                         }
                     ),
                     qos=mqtt.QoS.AT_MOST_ONCE)
                 print("Updated device info")
-            except Exception:
+            except Exception as e:
                 print("Failed to update device info")
-            finally:
-                await asyncio.sleep(60)
+                raise e
+
+            await asyncio.sleep(20)
 
     def run(self):
         self.listen_for_remote_access_request()
@@ -79,8 +77,13 @@ class Agent:
 
         try:
             loop.run_until_complete(task)
-        except asyncio.CancelledError:
-            pass
+        except asyncio.CancelledError as e:
+            print("Cancelled")
+            exit(2)
+        except Exception as e:
+            print("Exception was raised")
+            print(e)
+            exit(2)
 
 
 def run():
@@ -94,4 +97,4 @@ def run():
     else:
         logger.info("Remote access is turned off.")
         while True:
-            time.sleep(600)
+            time.sleep(60000)
