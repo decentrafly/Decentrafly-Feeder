@@ -183,6 +183,7 @@ def self_setup():
             print("Unable to get device attributes, resuming without ...")
 
         check_sudo_to("write config files to /etc/decentrafly")
+        exit_code = 0
         with tempfile.TemporaryDirectory() as tmpdirname:
             print("Registering a new device with decentrafly, this might take up to a minute ...")
             register_new_device(tmpdirname, device_attributes)
