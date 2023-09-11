@@ -89,7 +89,7 @@ class Agent:
 def run():
     if ('DCF_REMOTE_ACCESS' in effective_config and effective_config['DCF_REMOTE_ACCESS'] == "True"):
         logger.info("Remote access is enabled!")
-        agent = Agent(effective_config['DCF_CLIENT_ID'] + "-agent",
+        agent = Agent("beastdatafeed-" + effective_config['DCF_FEEDER_ID'] + "-agent",
                       "/etc/decentrafly/cert.crt",
                       "/etc/decentrafly/private.key",
                       "/etc/decentrafly/ca.crt")

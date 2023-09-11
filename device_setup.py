@@ -121,6 +121,7 @@ def register_new_device(temporary_dir, device_attributes):
     response = requests.request('POST',
                                 "https://api.decentrafly.org/api/devices/new",
                                 json={"attributes": device_attributes})
+    print(response.status_code)
     data = response.json()
     write_to_file(os.path.join(temporary_dir, "cert.crt"), data['agent_certs']['cert'])
     write_to_file(os.path.join(temporary_dir, "private.key"), data['agent_certs']['private_key'])
