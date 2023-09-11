@@ -35,9 +35,9 @@ check_dependency python3
 
 cd "$(mktemp -d)"
 
-curl -L 'https://github.com/decentrafly/MQTT-Feeder/releases/download/v2023-08-01_3/decentrafly' > decentrafly
+curl -L 'https://github.com/decentrafly/MQTT-Feeder/releases/download/v2023-09-11/decentrafly' > decentrafly
 echo "Checking file integrity"
-echo '07d0558a5b28337078c0bae30d25e6a7813a55fc  decentrafly' | sha1sum --check
+echo 'ce7ce57fc2e83defdc0e0389150d850d899b0e3f  decentrafly' | sha1sum --check
 
 
 chmod 777 decentrafly
