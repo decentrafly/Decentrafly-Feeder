@@ -39,6 +39,7 @@ def main():
         agent.run()
     elif command == "enable":
         device_setup.enable_services(executable)
+        device_setup.setup_agent()
     elif command == "install":
         device_setup.install(executable)
     elif command == "install-agent":
@@ -54,6 +55,7 @@ def main():
     elif command == "setup":
         device_setup.self_setup()
         device_setup.update_iot_device()
+        device_setup.update_config()
     elif command == "setup-agent":
         device_setup.setup_agent()
     elif command == "update-config":
