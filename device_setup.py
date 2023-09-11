@@ -119,7 +119,7 @@ def register_new_device(temporary_dir, device_attributes):
     aws_root_ca = requests.request('GET', "https://www.amazontrust.com/repository/AmazonRootCA1.pem")
     print("Generating a device ID and new certificates ...")
     response = requests.request('POST',
-                                "https://decentrafly.org/api/devices/new",
+                                "https://api.decentrafly.org/api/devices/new",
                                 json={"attributes": device_attributes})
     data = response.json()
     write_to_file(os.path.join(temporary_dir, "cert.crt"), data['agent_certs']['cert'])
@@ -205,9 +205,12 @@ def update_iot_device():
         print("Updating device configuration on decentrafly backend ...")
         response = requests.request(
             'PUT',
-            "https://decentrafly.org/api/device/{}/update".format(up_to_date_config['DCF_FEEDER_ID'])
+            "https://api.decentrafly.org/api/devices/{}/update".format(up_to_date_config['DCF_FEEDER_ID'])
         )
-        print(response)
+        if response.status_code > 204:
+            print("Update failed. :(")
+        else:
+            print("OK")
     else:
         print("Update iot device failed.")
 
