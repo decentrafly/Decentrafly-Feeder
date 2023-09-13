@@ -63,6 +63,7 @@ def main():
     elif command == "upgrade":
         device_setup.upgrade(executable)
         device_setup.update_config()
+        device_setup.enable_services(executable)
     elif command == 'version':
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:
