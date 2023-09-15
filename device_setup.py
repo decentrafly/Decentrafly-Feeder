@@ -130,7 +130,8 @@ def register_new_device(temporary_dir, device_attributes):
     write_to_file(os.path.join(temporary_dir, "mtls-private.key"), data['tls_certs']['private_key'])
     write_to_file(os.path.join(temporary_dir, "mtls-ca.crt"), data['tls_certs']['ca'])
 
-    config_content = {"DCF_FEEDER_ID": data['device_id']}
+    config_content = {'DCF_FEEDER_ID': data['device_id'],
+                      'DCF_FEEDER_TOKEN': data['device_token']}
     write_to_file(os.path.join(temporary_dir, "config.json"),
                   json.dumps(config_content, indent=2))
 
