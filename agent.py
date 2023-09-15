@@ -68,7 +68,8 @@ class Agent:
                         {
                             "device_id": ec('DCF_FEEDER_ID'),
                             "ip": device_ips[0],
-                            "time": str(time.time())
+                            "time": time.time(),
+                            "device_token": ec('DCF_FEEDER_TOKEN')
                         }
                     ),
                     qos=mqtt.QoS.AT_MOST_ONCE)
