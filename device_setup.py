@@ -256,14 +256,16 @@ def enable_services(executable):
     check_sudo_to("install the service")
 
     # Install the main forwarder service (MQTT)
-    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-adsb-forwarder.service", adsb_forwarder_systemd_service_file)
-    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-forwarder.service", mlat_forwarder_systemd_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-agent.service", decentrafly_agent_systemd_service_file)
     exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-client.service", mlat_client_system_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-mlat-forwarder.service", mlat_forwarder_systemd_service_file)
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly.service", main_systemd_service_file)
     exit_code += ensure_off_systemd_service('decentrafly.service')
+    exit_code += ensure_running_systemd_service("decentrafly-agent.service")
     exit_code += ensure_running_systemd_service('decentrafly-adsb-forwarder.service')
-    exit_code += ensure_running_systemd_service('decentrafly-mlat-forwarder.service')
     exit_code += ensure_running_systemd_service('decentrafly-mlat-client.service')
+    exit_code += ensure_running_systemd_service('decentrafly-mlat-forwarder.service')
 
     if exit_code == 0:
         print("Done")
@@ -284,25 +286,23 @@ def install(executable):
         print("Failed")
 
 
-def install_agent():
+def install_localproxy():
     localproxy_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm32/localproxy"
     exit_code = 0
     exit_code += download_file("/usr/bin/localproxy", localproxy_url, "777")
-    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-agent.service",
-                             decentrafly_agent_systemd_service_file)
     if exit_code == 0:
         print("Done")
     else:
         print("Failed")
 
 
-def setup_agent():
+def setup_remote_access():
     check_setup_dependencies()
-    if not (os.path.isfile("/usr/bin/localproxy")
-            and os.path.isfile("/usr/lib/systemd/system/decentrafly-agent.service")):
-        install_agent()
+    if not (os.path.isfile("/usr/bin/localproxy")):
+        install_localproxy()
     exit_code = 0
     exit_code += config.persist_config_entry("DCF_REMOTE_ACCESS", "True")
+    exit_code += unpack_file("/usr/lib/systemd/system/decentrafly-agent.service", decentrafly_agent_systemd_service_file)
     exit_code += ensure_running_systemd_service("decentrafly-agent.service")
     if exit_code == 0:
         print("Done")

@@ -10,19 +10,19 @@ log.debug("Entry point")
 
 def help():
     print("""Specify a command:
-    adsb-forwarder
-    agent
-    enable
-    install
-    install-agent
-    mlat-forwarder
-    requirements
-    sender
-    setup
-    setup-agent
-    update-config
-    upgrade
-    version""")
+    adsb-forwarder:      Connect to ADSB out and securely forward data to decentrafly
+    agent                The agent updates device info and optionally allows remote access (turned off by default)
+    enable               Makes sure all services are running
+    install              Install this binary to /usr/bin
+    install-localproxy   Needed for remote access. Only downloads tool, does not enable remote access.
+    mlat-forwarder       Securely forwards mlat-client output to decentrafly
+    requirements         Shows contents of the requirements.txt used to build this Python code.
+    sender               Deprecated MQTT forwarder.
+    setup                Installs certificates and registers this device with the decentrafly backend.
+    setup-remote-access  Enables remote access. This allows decentrafly staff to ssh into your device. (Can be disabled in /etc/decentrafly/config.json)
+    update-config        Update the dynamic parts of the config, such as decentrafly endpoints.
+    upgrade              Pull the latest decentrafly version and replace it.
+    version              Show version and exit.""")
 
 
 def main():
@@ -52,11 +52,10 @@ def main():
         agent.run()
     elif command == "enable":
         device_setup.enable_services(executable)
-        device_setup.setup_agent()
     elif command == "install":
         device_setup.install(executable)
-    elif command == "install-agent":
-        device_setup.install_agent()
+    elif command == "install-localproxy":
+        device_setup.install_localproxy()
     elif command == "mlat-forwarder":
         mlat_forwarder.run()
     elif command == "requirements":
@@ -69,8 +68,8 @@ def main():
         device_setup.self_setup()
         device_setup.update_iot_device()
         device_setup.update_config()
-    elif command == "setup-agent":
-        device_setup.setup_agent()
+    elif command == "setup-remote-access":
+        device_setup.setup_remote_access()
     elif command == "update-config":
         device_setup.update_config()
     elif command == "upgrade":
