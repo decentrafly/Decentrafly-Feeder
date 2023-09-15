@@ -1,5 +1,5 @@
 from awscrt import mqtt
-from config import effective_config, ec
+from config import ec
 from ip import get_device_ips
 import asyncio
 import json
@@ -26,6 +26,10 @@ class Agent:
         self.client_id = client_id
 
     def secure_tunnel_request(self, payload):
+        if ec('DCF_REMOTE_ACCESS') != "True":
+            # Double safe-guard to prevent unwanted remote access
+            raise Exception("Remote access is disabled.")
+
         request = json.loads(payload)
         if "destination" != request['clientMode']:
             logger.error("Remote requested secure tunnel with mode %s", request['clientMode'])
@@ -41,6 +45,10 @@ class Agent:
                           "-d", "localhost:22"])
 
     def listen_for_remote_access_request(self):
+        if ec('DCF_REMOTE_ACCESS') != "True":
+            # Double safe-guard to prevent unwanted remote access
+            raise Exception("Remote access is disabled.")
+
         topic = "$aws/things/{}/tunnels/notify".format(self.client_id)
         subscribe_future, packet_id = self.mqtt_connection.subscribe(
             topic=topic,
@@ -60,6 +68,7 @@ class Agent:
                         {
                             "device_id": ec('DCF_FEEDER_ID'),
                             "ip": device_ips[0],
+                            "time": str(time.time())
                         }
                     ),
                     qos=mqtt.QoS.AT_MOST_ONCE)
@@ -68,16 +77,20 @@ class Agent:
                 print("Failed to update device info")
                 raise e
 
-            await asyncio.sleep(20)
+            await asyncio.sleep(120)
 
     def run(self):
-        self.listen_for_remote_access_request()
+        # For uses that opt-in to remote access, we wait for connection requests
+        if ec('DCF_REMOTE_ACCESS') == "True":
+            logger.info("Remote access is enabled!")
+            self.listen_for_remote_access_request()
+
         loop = asyncio.get_event_loop()
         task = loop.create_task(self.update_ip_information())
 
         try:
             loop.run_until_complete(task)
-        except asyncio.CancelledError as e:
+        except asyncio.CancelledError:
             print("Cancelled")
             exit(2)
         except Exception as e:
@@ -87,14 +100,8 @@ class Agent:
 
 
 def run():
-    if ('DCF_REMOTE_ACCESS' in effective_config and effective_config['DCF_REMOTE_ACCESS'] == "True"):
-        logger.info("Remote access is enabled!")
-        agent = Agent("beastdatafeed-" + effective_config['DCF_FEEDER_ID'] + "-agent",
-                      "/etc/decentrafly/cert.crt",
-                      "/etc/decentrafly/private.key",
-                      "/etc/decentrafly/ca.crt")
-        agent.run()
-    else:
-        logger.info("Remote access is turned off.")
-        while True:
-            time.sleep(60000)
+    agent = Agent("beastdatafeed-" + ec('DCF_FEEDER_ID') + "-agent",
+                  "/etc/decentrafly/cert.crt",
+                  "/etc/decentrafly/private.key",
+                  "/etc/decentrafly/ca.crt")
+    agent.run()
