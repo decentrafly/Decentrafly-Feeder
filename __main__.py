@@ -9,7 +9,20 @@ log.debug("Entry point")
 
 
 def help():
-    print("Specify a command: (adsb-forwarder|agent|enable|install|mlat-forwarder|requirements|sender|setup|upgrade|version)")
+    print("""Specify a command:
+    adsb-forwarder
+    agent
+    enable
+    install
+    install-agent
+    mlat-forwarder
+    requirements
+    sender
+    setup
+    setup-agent
+    update-config
+    upgrade
+    version""")
 
 
 def main():
@@ -64,10 +77,12 @@ def main():
         device_setup.upgrade(executable)
         device_setup.update_config()
         device_setup.enable_services(executable)
-    elif command == 'version':
+    elif command == "version":
         with zipfile.ZipFile(executable) as z:
             with z.open('version.txt') as zf:
                 print(zf.read().decode("utf-8").strip())
+    else:
+        help()
 
     log.debug("Terminating")
 
