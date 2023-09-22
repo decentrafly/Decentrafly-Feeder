@@ -312,7 +312,7 @@ def setup_remote_access():
 
 
 def upgrade(executable):
-    url = "https://github.com/decentrafly/MQTT-Feeder/releases/latest/download/decentrafly"
+    url = "https://github.com/decentrafly/Decentrafly-Feeder/releases/latest/download/decentrafly"
     if download_file(executable, url, "777") == 0:
         print("Done")
     else:
