@@ -11,6 +11,7 @@ logger.setLevel(logging.INFO)
 def ssl_context():
     context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
                                          cafile=ec('DCF_CA_FILE'))
+
     context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
     context.check_hostname = True
     context.load_cert_chain(ec('DCF_CLIENT_CRT_FILE'),

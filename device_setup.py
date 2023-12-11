@@ -101,6 +101,21 @@ def check_setup_dependencies():
         exit(1)
 
 
+def detect_processor_architecture():
+    try:
+        result = subprocess.run(['uname', '-m'], capture_output=True, text=True, check=True)
+        architecture = result.stdout.strip()
+        return architecture
+    except subprocess.CalledProcessError as e:
+        # Handle subprocess errors
+        print(f"Error: {e}")
+    except Exception as e:
+        # Handle unexpected errors
+        print(f"Unexpected error: {e}")
+    # Return a default value in case of errors
+    return "Unknown"
+
+
 def check_sudo_to(reason):
     for x in range(3):
         print("\n\nI might ask for the sudo password to " + reason)
@@ -288,9 +303,19 @@ def install(executable):
 
 
 def install_localproxy():
-    localproxy_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm32/localproxy"
+    localproxy32_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm32/localproxy"
+    localproxy64_url = "https://decentrack-prod-binaries.s3.amazonaws.com/tools/arm64/localproxy"
+
+    running_arch = detect_processor_architecture()
+    if running_arch == 'armv7l':
+        download_url = localproxy32_url
+    elif running_arch == 'aarch64':
+        download_url = localproxy64_url
+    else:
+        print("FAILED: {} architecture not supported for SSH tunnels".format(running_arch))
+        return
     exit_code = 0
-    exit_code += download_file("/usr/bin/localproxy", localproxy_url, "777")
+    exit_code += download_file("/usr/bin/localproxy", download_url, "777")
     if exit_code == 0:
         print("Done")
     else:
