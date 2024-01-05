@@ -62,7 +62,8 @@ cd "$(mktemp -d)"
 echo "Installing dependencies ..."
 sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2 asyncio==3.4.3
 
-download_checksummed_binary /usr/bin/decentrafly "$download_path" "$checksum"
+download_checksummed_binary ./decentrafly "$download_path" "$checksum"
+chmod 777 ./decentrafly
 
 ./decentrafly setup "$invite_id" "$invite_sig" < /dev/tty
 ./decentrafly install
