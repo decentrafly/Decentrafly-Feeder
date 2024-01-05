@@ -7,8 +7,8 @@ if [[ -z "${2+x}" ]]; then
     exit 1
 fi
 
-download_path='https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2023-09-22/decentrafly'
-checksum='0ba656b9a3fc7a3aa557fc28bdd4d482c0b0fe94'
+download_path='https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2024-01-05_2/decentrafly'
+checksum='cb22232c6c0018c76068757a855d84efb2182706  decentrafly'
 invite_id="$1"
 invite_sig="$2"
 
