@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+download_path='https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2023-09-22/decentrafly'
+checksum='0ba656b9a3fc7a3aa557fc28bdd4d482c0b0fe94'
+
 function help_package_install() {
     cat <<HERE
 On Debian-based systems
@@ -26,6 +29,20 @@ function check_dependency() {
     }
 }
 
+function download_checksummed_binary() {
+    local target_path="$1"
+    local source_url="$2"
+    local sha1_checksum="$3"
+
+    local tmp_path="$(mktemp)"
+
+    curl -L "$source_url" > "$tmp_path"
+    echo "Checking file integrity for $source_url"
+    echo "$sha1_checksum  $tmp_path" | sha1sum --check || { echo "Verify failed"; exit 1; }
+    pwd
+    cp "$tmp_path" "$target_path"
+}
+
 # Pre-Flight Checks
 check_dependency curl
 check_dependency env
@@ -35,16 +52,10 @@ check_dependency python3
 
 cd "$(mktemp -d)"
 
-
-curl -L 'https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2023-09-22/decentrafly' > decentrafly
-echo "Checking file integrity"
-echo '0ba656b9a3fc7a3aa557fc28bdd4d482c0b0fe94  decentrafly' | sha1sum --check
-
-
-chmod 777 decentrafly
-
 echo "Installing dependencies ..."
 sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87 requests==2.28.2 asyncio==3.4.3
+
+download_checksummed_binary /usr/bin/decentrafly "$download_path" "$checksum"
 
 ./decentrafly setup < /dev/tty
 ./decentrafly install
