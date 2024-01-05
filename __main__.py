@@ -65,7 +65,7 @@ def main():
     elif command == "sender":
         sender.run()
     elif command == "setup":
-        device_setup.self_setup()
+        device_setup.self_setup(invite_id=args[2], invite_signature=args[3])
         device_setup.update_iot_device()
         device_setup.update_config()
     elif command == "setup-remote-access":

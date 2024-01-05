@@ -130,11 +130,18 @@ def check_sudo_to(reason):
     exit(2)
 
 
-def register_new_device(temporary_dir, device_attributes):
+def register_new_device(temporary_dir, device_attributes, invite_id, invite_signature):
     aws_root_ca = requests.request('GET', "https://www.amazontrust.com/repository/AmazonRootCA1.pem")
     print("Generating a device ID and new certificates ...")
+    if invite_id is None or invite_signature is None:
+        print("Missing invite ID and/or signature")
+        exit(2)
     response = requests.request('POST',
-                                "https://api.decentrafly.org/api/devices/new",
+                                "https://api.decentrafly.org/api/devices/invites/accept",
+                                params={
+                                    'id': invite_id,
+                                    'sig': invite_signature,
+                                },
                                 json={"attributes": device_attributes})
     print(response.status_code)
     data = response.json()
@@ -185,7 +192,7 @@ def detect_device_attributes():
     return adsb_config
 
 
-def self_setup():
+def self_setup(invite_id=None, invite_signature=None):
     if not (os.path.isfile(os.path.expanduser("/etc/decentrafly/ca.crt"))
             and os.path.isfile(os.path.expanduser("/etc/decentrafly/cert.crt"))
             and os.path.isfile(os.path.expanduser("/etc/decentrafly/private.key"))):
@@ -200,7 +207,7 @@ def self_setup():
         exit_code = 0
         with tempfile.TemporaryDirectory() as tmpdirname:
             print("Registering a new device with decentrafly, this might take up to a minute ...")
-            register_new_device(tmpdirname, device_attributes)
+            register_new_device(tmpdirname, device_attributes, invite_id, invite_signature)
             exit_code += subprocess.call(['sudo', 'cp', '-r', tmpdirname, "/etc/decentrafly"])
             exit_code += subprocess.call(['sudo', 'chmod', '755', tmpdirname, "/etc/decentrafly"])
         if exit_code == 0:
