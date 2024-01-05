@@ -2,8 +2,15 @@
 
 set -euo pipefail
 
+if [[ -z "${2+x}" ]]; then
+    echo "Usage: install.sh <invite-id> <invite-signature>"
+    exit 1
+fi
+
 download_path='https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2023-09-22/decentrafly'
 checksum='0ba656b9a3fc7a3aa557fc28bdd4d482c0b0fe94'
+invite_id="$1"
+invite_sig="$2"
 
 function help_package_install() {
     cat <<HERE
@@ -57,6 +64,6 @@ sudo pip3 install awscrt==0.16.13 awsiot==0.1.3 awsiotsdk==1.12.6 boto3==1.26.87
 
 download_checksummed_binary /usr/bin/decentrafly "$download_path" "$checksum"
 
-./decentrafly setup < /dev/tty
+./decentrafly setup "$invite_id" "$invite_sig" < /dev/tty
 ./decentrafly install
 ./decentrafly enable
