@@ -8,7 +8,7 @@ if [[ -z "${2+x}" ]]; then
 fi
 
 download_path='https://github.com/decentrafly/Decentrafly-Feeder/releases/download/v2024-01-05_2/decentrafly'
-checksum='cb22232c6c0018c76068757a855d84efb2182706  decentrafly'
+checksum='cb22232c6c0018c76068757a855d84efb2182706'
 invite_id="$1"
 invite_sig="$2"
 
