@@ -18,7 +18,7 @@ Follow these steps to install Decentrafly's Feeder onto your Raspberry Pi Device
 To install Decentrafly's feeder, simply run the following one-line command in your terminal:
 
 <pre>
-curl -L https://raw.githubusercontent.com/decentrafly/Decentrafly-Feeder/main/install.sh | bash
+curl -L https://raw.githubusercontent.com/decentrafly/Decentrafly-Feeder/main/install.sh | bash /dev/stdin <invite-id> <invite-signature>
 </pre>
 
 This installs the services:
