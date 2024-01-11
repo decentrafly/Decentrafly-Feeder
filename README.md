@@ -44,7 +44,7 @@ or
 
 Check the Tar1090 map at:
 
-https://map.decentrafly.org
+https://globe.decentrafly.org
 
 ## Account-Signup
 
